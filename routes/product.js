@@ -23,17 +23,6 @@ router.post('/', (req, res) => {
     .catch(err => {
       res.json(err)
     })
-
-  //
-  // const newProduct = {
-  //   name : req.body.productName,
-  //   price : req.body.productPrice
-  // }
-  //
-  // res.json({
-  //   message : 'product created..',
-  //   productInfo : newProduct
-  // })
 })
 
 // product get total
@@ -119,7 +108,7 @@ router.delete('/', (req, res) => {
     .remove()
     .then(() => {
       res.json({
-        message : 'product deleted'
+        message : 'product all deleted'
       })
     })
     .catch(err => {
