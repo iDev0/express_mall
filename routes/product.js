@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-
 const productModel = require('../model/product')
+const checkAuth = require('../middleware/check_auth')
 
 
 // product 생성
-router.post('/', (req, res) => {
+router.post('/', checkAuth, (req, res) => {
 
   const newProduct = new productModel({
     name : req.body.productName,
@@ -58,7 +58,7 @@ router.get('/', (req, res) => {
 })
 
 // detail Get
-router.get('/:productId', (req, res) => {
+router.get('/:productId', checkAuth, (req, res) => {
   const id = req.params.productId
   productModel
     .findById(id)
@@ -79,7 +79,7 @@ router.get('/:productId', (req, res) => {
 
 
 // product update
-router.patch('/:productId', (req, res) => {
+router.patch('/:productId', checkAuth, (req, res) => {
 
   const id = req.params.productId
   const updateOps = {}
@@ -102,7 +102,7 @@ router.patch('/:productId', (req, res) => {
 })
 
 // product delete all
-router.delete('/', (req, res) => {
+router.delete('/', checkAuth, (req, res) => {
   // 전체 삭제
   productModel
     .remove()
@@ -117,7 +117,7 @@ router.delete('/', (req, res) => {
 })
 
 // product delete by id
-router.delete('/:productId', (req, res) => {
+router.delete('/:productId', checkAuth, (req, res) => {
   const productId = req.params.productId
   productModel
     .findByIdAndDelete(productId)

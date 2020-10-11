@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-
 const orderModel = require('../model/order')
-const productModel = require('../model/product')
+const checkAuth = require('../middleware/check_auth')
+
 
 
 // order register
-router.post('/', (req, res) => {
+router.post('/', checkAuth, (req, res) => {
 
   const order = new orderModel({
     product : req.body.productId,
@@ -33,18 +33,18 @@ router.post('/', (req, res) => {
 })
 
 // order read
-router.get('/', (req, res) => {
+router.get('/', checkAuth, (req, res) => {
   orderModel
     .find()
-    .populate('product')
+    .populate('product', ["name", "price"])
     .then(items => {
-
-      if (items.length === 0) {
-        res.json({
-          message : 'order is Empty'
-        })
-        return
-      }
+      console.log(items)
+      // if (items.length === 0) {
+      //   res.json({
+      //     message : 'order is Empty'
+      //   })
+      //   return
+      // }
 
 
       res.json({
@@ -52,14 +52,25 @@ router.get('/', (req, res) => {
         orderInfo : items.map(item => {
           return {
             id : item._id,
-            product: {
-              id : item.product._id,
-              name : item.product.name,
-              price : item.product.price,
-            },
-            quantity: item.quantity
+            quantity : item.quantity,
+            product : item.product,
+            request : {
+              type : 'GET',
+              url : 'http://localhost:5000/order/' + item._id
+            }
           }
-        })
+        }),
+        // orderInfo : items.map(item => {
+        //   return {
+        //     id : item._id,
+        //     product: {
+        //       id : item.product._id,
+        //       name : item.product.name,
+        //       price : item.product.price,
+        //     },
+        //     quantity: item.quantity
+        //   }
+        // })
       })
     })
     .catch(err => {
@@ -67,7 +78,7 @@ router.get('/', (req, res) => {
     })
 })
 // order modify
-router.patch('/:orderId', (req, res) => {
+router.patch('/:orderId', checkAuth, (req, res) => {
   const id = req.params.orderId
   const updateOrderInfo = {}
 
@@ -79,7 +90,11 @@ router.patch('/:orderId', (req, res) => {
     .findByIdAndUpdate(id, { $set : updateOrderInfo })
     .then(() => {
       res.json({
-        message : 'updated order at' + id
+        message : 'updated order at' + id,
+        request : {
+          type : 'GET',
+          url : 'http://localhost:5000/order' + id
+        }
       })
     })
     .catch(err => {
@@ -88,7 +103,7 @@ router.patch('/:orderId', (req, res) => {
 })
 
 // order remove
-router.delete('/:orderId', (req, res) => {
+router.delete('/:orderId', checkAuth, (req, res) => {
   const orderId = req.params.orderId
   orderModel
     .findByIdAndDelete(orderId)
@@ -104,7 +119,7 @@ router.delete('/:orderId', (req, res) => {
 })
 
 // order remove all
-router.delete('/', (req, res) => {
+router.delete('/', checkAuth, (req, res) => {
   orderModel
     .remove()
     .then(() => {
