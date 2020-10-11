@@ -8,9 +8,11 @@ const checkAuth = require('../middleware/check_auth')
 // order register
 router.post('/', checkAuth, (req, res) => {
 
+  const { product, quantity } = req.body
+
   const order = new orderModel({
-    product : req.body.productId,
-    quantity : req.body.qty
+    product,
+    quantity
   })
 
   order
@@ -38,15 +40,6 @@ router.get('/', checkAuth, (req, res) => {
     .find()
     .populate('product', ["name", "price"])
     .then(items => {
-      console.log(items)
-      // if (items.length === 0) {
-      //   res.json({
-      //     message : 'order is Empty'
-      //   })
-      //   return
-      // }
-
-
       res.json({
         message : 'order get...',
         orderInfo : items.map(item => {
@@ -60,17 +53,6 @@ router.get('/', checkAuth, (req, res) => {
             }
           }
         }),
-        // orderInfo : items.map(item => {
-        //   return {
-        //     id : item._id,
-        //     product: {
-        //       id : item.product._id,
-        //       name : item.product.name,
-        //       price : item.product.price,
-        //     },
-        //     quantity: item.quantity
-        //   }
-        // })
       })
     })
     .catch(err => {
